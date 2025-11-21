@@ -163,22 +163,13 @@ function PageContent() {
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  // MOBILE VIEW CURRENTLY DISABLED
-  // useEffect(() => {
-  //   if (typeof window === "undefined") return;
-  //   const mq = window.matchMedia("(max-width: 1023px)"); // Tailwind 'lg' breakpoint
-  //   const handle = (e: MediaQueryList | MediaQueryListEvent) => {
-  //     setIsMobile(!!e.matches);
-  //     if (e.matches) {
-  //       setMobileStage("preview"); // start on preview for mobile
-  //     } else {
-  //       setMobileStage("form"); // desktop behaves like form visible
-  //     }
-  //   };
-  //   handle(mq);
-  //   mq.addEventListener?.("change", handle);
-  //   return () => mq.removeEventListener?.("change", handle);
-  // }, []);
+  useEffect(() => {
+    if (isMobile) {
+      setMobileStage("preview");
+    } else {
+      setMobileStage("form");
+    }
+  }, [isMobile]);
 
   const setField = (key: string, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value?.toString?.() ?? "" }));
@@ -406,29 +397,6 @@ function PageContent() {
     }
   }, [formName, formVersion, formRes]);
 
-  // If on mobile, show a desktop-recommendation message.
-  if (isMobile) {
-    return (
-      <div className="container mx-auto px-4 pt-8">
-        <div className="mx-auto max-w-xl rounded-md border bg-white p-6 text-center">
-          <h2 className="text-lg font-semibold">This page works best on desktop</h2>
-          <p className="mt-2 text-justify text-sm text-gray-600">
-            For the best experience, please access this page on a desktop device. Mobile support is
-            coming soon. <br></br>
-            <br></br>
-            If you need help, contact us via {""}
-            <a
-              href="https://www.facebook.com/profile.php?id=61579853068043"
-              className="font-semibold underline"
-            >
-              Facebook
-            </a>
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto space-y-4 px-4 pt-8">
       <div>
@@ -445,7 +413,7 @@ function PageContent() {
         {/* Form Renderer */}
         <div className="space-y-4">
           <div className={cn("mb-2 sm:hidden", mobileStage === "preview" ? "" : "hidden")}>
-            <div className="relative h-[50vh] w-full">
+            <div className="relative h-[60vh] w-full overflow-auto rounded-md border">
               {docUrl ? (
                 <DocumentRenderer
                   documentUrl={docUrl}
@@ -471,7 +439,7 @@ function PageContent() {
 
           {/* Mobile: confirm preview stage */}
           <div className={cn("sm:hidden", mobileStage === "confirm" ? "" : "hidden")}>
-            <div className="relative h-[60vh] w-full overflow-hidden rounded-md border">
+            <div className="relative h-[60vh] w-full overflow-auto rounded-md border">
               {docUrl ? (
                 <DocumentRenderer
                   documentUrl={docUrl}
@@ -604,17 +572,19 @@ function PageContent() {
               </Card>
             )}
 
-            <div className="mb-4 flex gap-2 text-xs text-gray-500">
-              <Info className="size-8 lg:size-5" />
-              By selecting Submit & Sign, I agree that the signature and initials will be the
-              electronic representation of my signature and initials for all purposes when I (or my
-              agent) use them on documents, including legally binding contracts
+            <div className="mt-1 flex items-start gap-2 text-xs text-gray-500">
+              <Info className="mt-1 h-3 w-3 flex-shrink-0" />
+              <div>
+                By selecting Submit & Sign, I agree that the signature and initials will be the
+                electronic representation of my signature and initials for all purposes when I (or
+                my agent) use them on documents, including legally binding contracts
+              </div>
             </div>
           </div>
         </div>
 
         {/* PDF Renderer - hidden on small screens, visible on sm+ */}
-        <div className="relative hidden h-[70svh] w-full overflow-hidden rounded-md border sm:block">
+        <div className="relative hidden h-[77svh] w-full overflow-auto sm:block">
           {!loadingForm && audienceAllowed ? (
             <div className="absolute inset-0 flex h-full w-full flex-row gap-2">
               {!!docUrl && (
